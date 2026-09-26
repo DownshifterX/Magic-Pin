@@ -16,6 +16,9 @@ That's it!
 Author: magicpin AI Challenge Team
 """
 
+import os
+import sys
+
 # =============================================================================
 # ██████  CONFIGURATION - EDIT THIS SECTION ██████
 # =============================================================================
@@ -41,9 +44,6 @@ TEST_SCENARIO = "phase2_short"
 # =============================================================================
 # ██████  END OF CONFIGURATION - DON'T EDIT BELOW THIS LINE ██████
 # =============================================================================
-
-import os
-import sys
 
 # Ensure UTF-8 output encoding on Windows consoles
 if sys.platform == "win32":
@@ -976,11 +976,9 @@ def main():
     print_header("magicpin AI Challenge — LLM Judge")
 
     # Validate configuration
-    if LLM_PROVIDER != "ollama" and not LLM_API_KEY:
-        print_fail("LLM_API_KEY is not set!")
-        print_info("Edit the CONFIGURATION section at the top of this file")
-        print_info("Set your API key for your chosen provider")
-        sys.exit(1)
+    if LLM_PROVIDER != "ollama" and LLM_PROVIDER != "heuristic" and not LLM_API_KEY:
+        print_info("No LLM_API_KEY detected — automatically using offline Heuristic Rule Judge")
+        globals()['LLM_PROVIDER'] = "heuristic"
 
     # Create LLM provider
     try:
