@@ -34,7 +34,7 @@ class BotRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
-        if self.path == "/v1/healthz":
+        if self.path in ("/v1/healthz", "/healthz", "/"):
             uptime = int(time.time() - START_TIME)
             self._send_json(200, {
                 "status": "ok",
@@ -48,7 +48,7 @@ class BotRequestHandler(BaseHTTPRequestHandler):
             })
             return
 
-        if self.path == "/v1/metadata":
+        if self.path in ("/v1/metadata", "/metadata"):
             self._send_json(200, {
                 "team_name": "Team Vera Elite",
                 "team_members": ["Antigravity"],
@@ -71,7 +71,7 @@ class BotRequestHandler(BaseHTTPRequestHandler):
             self._send_json(400, {"accepted": False, "reason": "invalid_json", "details": str(e)})
             return
 
-        if self.path == "/v1/context":
+        if self.path in ("/v1/context", "/context"):
             scope = body.get("scope")
             context_id = body.get("context_id")
             version = body.get("version", 1)
@@ -94,7 +94,7 @@ class BotRequestHandler(BaseHTTPRequestHandler):
             })
             return
 
-        if self.path == "/v1/tick":
+        if self.path in ("/v1/tick", "/tick"):
             available_triggers = body.get("available_triggers", [])
             actions = []
             for trg_id in available_triggers:
@@ -128,7 +128,7 @@ class BotRequestHandler(BaseHTTPRequestHandler):
             self._send_json(200, {"actions": actions})
             return
 
-        if self.path == "/v1/reply":
+        if self.path in ("/v1/reply", "/reply"):
             conv_id = body.get("conversation_id", "default_conv")
             mid = body.get("merchant_id")
             cid = body.get("customer_id")
@@ -149,7 +149,7 @@ class BotRequestHandler(BaseHTTPRequestHandler):
 def run(port: int = 8080):
     server_address = ('', port)
     httpd = HTTPServer(server_address, BotRequestHandler)
-    print(f"Bot server listening on http://localhost:{port}")
+    print(f"Bot server listening on port {port}")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
@@ -157,5 +157,6 @@ def run(port: int = 8080):
     httpd.server_close()
 
 if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+    env_port = os.environ.get("PORT")
+    port = int(env_port) if env_port else (int(sys.argv[1]) if len(sys.argv) > 1 else 8080)
     run(port)
