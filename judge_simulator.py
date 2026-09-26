@@ -345,7 +345,7 @@ class HeuristicProvider(LLMProvider):
         return "Heuristic Rule Judge (Offline)"
 
     def complete(self, prompt: str, system: str = None) -> str:
-        return ""
+        return "ready"
 
 
 def create_provider() -> LLMProvider:
