@@ -1,0 +1,99 @@
+================================================================================
+VERA AI BOT - MAGICPIN CHALLENGE PROJECT OVERVIEW & DOCUMENTATION
+================================================================================
+
+1. PROJECT OVERVIEW
+--------------------------------------------------------------------------------
+Vera AI Bot is a state-of-the-art AI Merchant Assistant built for the magicpin 
+AI Challenge. The bot acts as an expert digital growth consultant for hyper-local 
+merchants across five key categories (Dentists, Salons, Restaurants, Gyms, Pharmacies).
+
+Key Features & Strengths:
+- **50/50 Quality Scorer**: Optimized to achieve top marks across all 5 evaluation metrics:
+  1. Specificity: Extracts exact metrics, dates, percentages, and citations from payloads.
+  2. Category Fit: Adapts tone per domain (Clinical Peer for Dentists, Warm Stylist for Salons, High-energy Coach for Gyms, etc.).
+  3. Merchant Fit: Incorporates merchant ratings, review themes, and historical data.
+  4. Decision Quality: Recommends high-impact offers and strategy suggestions matching the trigger kind.
+  5. Engagement Compulsion: Uses loss aversion framing, single low-friction CTAs, and curiosity hooks.
+- **LLM Judge Simulation**: Built-in scoring module (`judge_simulator.py`) using Gemini AI / LLM evaluation rubric.
+- **Automated Verification Harness**: Includes end-to-end testing of health checks, context push, intent transitions, auto-reply detection, and hostile message handling.
+
+--------------------------------------------------------------------------------
+2. FILE STRUCTURE & PURPOSE OF EACH FILE
+--------------------------------------------------------------------------------
+
+Core Application Files:
+- `bot.py`
+  - PURPOSE: The main intelligence module containing the `compose()` function and logic.
+  - USE: Evaluates incoming messages/triggers and generates structured, highly personalized merchant recommendations.
+
+- `server.py`
+  - PURPOSE: Flask/HTTP backend server providing API endpoints (`/healthz`, `/metadata`, `/context/category`, `/context/merchant`, `/tick`).
+  - USE: Receives webhook requests and interfaces between the test runner / magicpin platform and `bot.py`.
+
+- `judge_simulator.py`
+  - PURPOSE: Evaluates generated responses against the 5 judging dimensions (0-50 total score). Supports offline rule heuristic scoring and optional Gemini API direct judge evaluation.
+  - USE: Used during tuning to ensure response quality meets target thresholds.
+
+- `test_harness.py`
+  - PURPOSE: Automated test runner that executes comprehensive end-to-end checks (Warmup, Context Push, Auto-Reply, Intent Switching, Hostile message termination).
+  - USE: Run this script to verify bot stability and behavioral compliance.
+
+- `generate_submission.py`
+  - PURPOSE: Batch script to run all 30 benchmark trigger seeds through the engine.
+  - USE: Output is saved to `submission.jsonl` for submission to the competition portal.
+
+Dataset Directory (`/dataset`):
+- `dataset/merchants_seed.json`
+  - Contains sample seed data for 5 different merchants across categories.
+- `dataset/triggers_seed.json`
+  - Contains 30 representative benchmark triggers (IPL matches, negative review spikes, competitor price drops, seasonal dips, etc.).
+- `dataset/categories/*.json` (dentists.json, salons.json, restaurants.json, gyms.json, pharmacies.json)
+  - Category knowledge files defining voice guidelines, recommended offer catalogs, peer benchmark stats, and industry digests.
+
+Project Configuration Files:
+- `README.md`
+  - Full technical specification, execution commands, and architectural diagram.
+- `requirements.txt`
+  - List of standard Python package dependencies (Flask, requests, google-genai, etc.).
+
+--------------------------------------------------------------------------------
+3. HOW TO USE & RUN THIS PROJECT (FOR NEW USERS)
+--------------------------------------------------------------------------------
+
+STEP 1: Install Dependencies
+-----------------------------
+Open a terminal in the project directory and run:
+  pip install -r requirements.txt
+
+STEP 2: Start the Webhook Server
+--------------------------------
+Run the background server:
+  python server.py
+(The server starts locally on http://127.0.0.1:5000)
+
+STEP 3: Run the Test Harness
+----------------------------
+In a separate terminal, execute the test suite:
+  python test_harness.py
+
+This will test:
+  1. Health check & metadata responses
+  2. Category & Merchant context pushing
+  3. Auto-reply detection
+  4. Intent state transition (switching from preview to action execution)
+  5. Hostile merchant message handling
+
+STEP 4: Generate the Final Submission File
+------------------------------------------
+To create the competition submission payload containing generated responses for all 30 triggers:
+  python generate_submission.py
+
+Output File: `submission.jsonl`
+
+STEP 5: (Optional) Run LLM Judge Scoring
+----------------------------------------
+To evaluate responses with the offline or Gemini-backed judge simulator:
+  python judge_simulator.py
+
+================================================================================
